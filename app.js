@@ -18,13 +18,14 @@ mongoose.connect(
 );
 mongoose.Promise = global.Promise;
 
-app.use(morgan("dev"));
-app.use('/uploads', express.static('uploads'));
+app.use(morgan("dev")); //日誌
+app.use('/uploads', express.static('uploads')); //圖片上傳public資料夾
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// CORS
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "*"/*"http://yourDomain.com"*/);
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -36,17 +37,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes which should handle requests
+// Routes & prefix
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 app.use("/user", userRoutes);
 
+// Error: Routes Not found
 app.use((req, res, next) => {
   const error = new Error("Not found");
   error.status = 404;
   next(error);
 });
 
+// response all kinds of Error
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
   res.json({
